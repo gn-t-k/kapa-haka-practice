@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ハカ練習プレーヤー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a href="index.html">← 曲一覧</a>
+      <h1 id="song-title">読み込み中…</h1>
+    </header>
+
+    <div class="stage">
+      <div class="video-box" id="video-box">
+        <div id="yt-player"></div>
+        <video id="local-video" playsinline controls hidden></video>
+      </div>
+      <div class="error" id="error" hidden></div>
+
+      <div class="subtitle" id="subtitle">
+        <div class="cur-kana" id="cur-kana"></div>
+        <div class="cur-text" id="cur-text"></div>
+        <div class="next" id="next"></div>
+      </div>
+      <div class="status-row">
+        <span id="time-display">0.0 秒</span>
+        <span id="loop-display">ループ 0 周</span>
+      </div>
+      <div class="main-controls">
+        <button class="primary" id="btn-play">▶ 再生</button>
+        <button id="btn-restart">⏮ 頭から</button>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>再生速度</h2>
+      <div class="seg" id="rate-buttons">
+        <button data-rate="0.5">0.5倍</button>
+        <button data-rate="0.75">0.75倍</button>
+        <button data-rate="1" class="on">1倍</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>ループ区間</h2>
+      <div class="row">
+        <label class="inline">開始 <input type="number" id="loop-start" step="0.1" min="0" inputmode="decimal"> 秒</label>
+        <button class="small" id="loop-start-now">今の位置</button>
+      </div>
+      <div class="row">
+        <label class="inline">終了 <input type="number" id="loop-end" step="0.1" min="0" inputmode="decimal"> 秒</label>
+        <button class="small" id="loop-end-now">今の位置</button>
+      </div>
+      <div class="row">
+        <label class="inline">回数の上限 <input type="number" id="loop-limit" step="1" min="0" inputmode="numeric" placeholder="無制限"> 周</label>
+        <button class="small" id="loop-count-reset">周回数リセット</button>
+      </div>
+      <div class="row">
+        <button class="small" id="loop-reset">ループ区間を元に戻す</button>
+      </div>
+      <p class="note">上限を空欄または 0 にすると無制限にループします。</p>
+    </section>
+
+    <section class="panel">
+      <h2>動画の切り替え（通信量対策）</h2>
+      <div class="row">
+        <label class="btn file-label">📁 端末内の動画を使う
+          <input type="file" id="file-input" accept="video/*">
+        </label>
+        <button id="btn-youtube" hidden>YouTube に戻す</button>
+      </div>
+      <p class="note" id="mode-note">いまは YouTube で再生しています。</p>
+      <p class="note">画質はプレーヤーの設定（⚙）で360p程度にすると通信量を抑えられます。端末内の動画を使うと通信は発生しません。</p>
+    </section>
+
+    <section class="panel">
+      <h2>字幕タイミング</h2>
+      <div class="row">
+        <button id="btn-timing-mode">タイミング合わせモード</button>
+      </div>
+      <div id="timing-tools" hidden>
+        <p class="tap-target" id="tap-target"></p>
+        <button class="primary tap-next" id="btn-tap">次 ▶</button>
+        <div class="row">
+          <button class="small" id="btn-tap-first">最初のフレーズから記録し直す</button>
+        </div>
+        <p class="note">再生中にフレーズが始まった瞬間に「次」をタップすると、その秒数が記録されます。一覧の行をタップすると、そのフレーズから記録を始められます。秒数をタップするとその位置へ移動します。</p>
+      </div>
+      <p class="note" id="timing-source"></p>
+      <ul class="phrase-list" id="phrase-list"></ul>
+      <div class="row">
+        <button class="small" id="btn-copy-json">JSONをコピー</button>
+        <button class="small" id="btn-reset-timing">共有の設定に戻す</button>
+      </div>
+      <textarea class="json-out" id="json-out" readonly hidden></textarea>
+      <p class="note">編集したタイミングはこの端末にだけ保存されます。全員に反映するには「JSONをコピー」して <code>songs/<span id="song-id"></span>.json</code> に貼り付けてコミットしてください。</p>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="player.js"></script>
+</body>
+</html>

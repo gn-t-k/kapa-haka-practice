@@ -1,0 +1,29 @@
+{
+  "title": "Tika Tonu",
+  "youtubeId": "NYIrQ3LzTKY",
+  "loop": { "start": 0, "end": 57 },
+  "phrases": [
+    {"kana": "キ・アロ", "text": "Ki aro", "start": null},
+    {"kana": "キア・ファカロンガ、キア・マウ！", "text": "Kia whakaronga, kia mau!", "start": null},
+    {"kana": "ヒ！", "text": "Hi!", "start": null},
+    {"kana": "リンガリンガ・エ・トローナ", "text": "Ringaringa e torōna", "start": null},
+    {"kana": "ケイ・ワホ・ホキ・マイ！", "text": "kei waho hoki mai!", "start": null},
+    {"kana": "ッス・ッス", "text": "Kss Kss", "start": null},
+    {"kana": "ティカ・トヌ！", "text": "Tika tonu!", "start": null},
+    {"kana": "ウー・エ！", "text": "U-e!", "start": null},
+    {"kana": "ティカ・トヌ！", "text": "Tika tonu!", "start": null},
+    {"kana": "ウー・エ！", "text": "U-e!", "start": null},
+    {"kana": "ティカ・トヌ・アトゥ・キ・ア・コエ、エ・タマ", "text": "Tika tonu atu ki a koe, e tama", "start": null},
+    {"kana": "ヒキ・ネイ・コエ・アク・ファカアロ、パキア！", "text": "Hiki nei koe aku whakaaro, pakia!", "start": null},
+    {"kana": "ヘ・ヒキ・アハ・トー・ヒキ？", "text": "He hiki aha tō hiki?", "start": null},
+    {"kana": "ヘ・ヒキ・ロア・トー・ヒキ？", "text": "He hiki roa tō hiki?", "start": null},
+    {"kana": "イ・ア・ハ・ハー！", "text": "I a ha hā!", "start": null},
+    {"kana": "エ・タマ、テ・ウアウア・アナ", "text": "E tama, te uaua ana", "start": null},
+    {"kana": "エ・タマ、テ・マーロー", "text": "E tama, te mārō", "start": null},
+    {"kana": "ロア・イナ・ホキ・ラー", "text": "Roa ina hoki rā", "start": null},
+    {"kana": "テ・トヘ・オ・テ・ウアウア・ナー", "text": "Te tohe o te uaua nā", "start": null},
+    {"kana": "エ・ターウ・ネイ", "text": "E tāu nei", "start": null},
+    {"kana": "アーナ！アーナ！アーナ！", "text": "Āna! Āna! Āna!", "start": null},
+    {"kana": "アウエ…ヒー！", "text": "Aue... Hī!", "start": null}
+  ]
+}
