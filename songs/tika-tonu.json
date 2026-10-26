@@ -1,11 +1,8 @@
 {
   "title": "Tika Tonu",
   "youtubeId": "NYIrQ3LzTKY",
-  "loop": { "start": 8, "end": 57 },
+  "loop": { "start": 14, "end": 57 },
   "phrases": [
-    {"kana": "リンガリンガ・エ・トローナ", "text": "Ringaringa e torōna", "start": null},
-    {"kana": "ケイ・ワホ・ホキ・マイ！", "text": "kei waho hoki mai!", "start": null},
-    {"kana": "ッス・ッス", "text": "Kss Kss", "start": null},
     {"kana": "ティカ・トヌ！", "text": "Tika tonu!", "start": null},
     {"kana": "ウー・エ！", "text": "U-e!", "start": null},
     {"kana": "ティカ・トヌ！", "text": "Tika tonu!", "start": null},
