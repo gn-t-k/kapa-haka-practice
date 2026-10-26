@@ -25,7 +25,8 @@
   // ---------- 状態 ----------
   let song = null;
   let starts = [];            // 各フレーズの開始秒（null = 未設定）
-  let timingsAreLocal = false;
+  let sharedStarts = [];      // 曲のJSONの値
+  let timingsDirty = false;   // 未送信の編集があるか
   let loop = { start: 0, end: 0 };
   let loopLimit = 0;          // 0 = 無制限
   let loopCount = 0;
@@ -279,21 +280,19 @@
   }
 
   // ---------- タイミング編集 ----------
-  function setStarts(next, persist) {
+  // 編集はメモリ上だけ（保存しない）。確定させるには Claude に送って JSON に反映してもらう
+  function setStarts(next, edited) {
     starts = next;
-    if (persist) {
-      save('timings', starts);
-      timingsAreLocal = true;
-    }
+    timingsDirty = edited;
     renderPhraseList();
     renderSubtitleArea();
-    $('json-out').hidden = true;
+    $('send-out').hidden = true;
   }
 
   function updateTimingSource() {
-    $('timing-source').textContent = timingsAreLocal
-      ? 'この端末で編集したタイミングを使っています。'
-      : (hasAnyTiming() ? '共有のタイミング（曲のJSON）を使っています。' : 'タイミングはまだ設定されていません。');
+    $('timing-source').textContent = timingsDirty
+      ? '編集中です（未保存）。ページを閉じると消えるので「Claudeに送る」で送ってください。'
+      : (hasAnyTiming() ? '曲のJSONのタイミングを使っています。' : 'タイミングはまだ設定されていません。');
   }
 
   function renderPhraseList() {
@@ -380,43 +379,56 @@
     updateTapTarget();
   }
 
-  function songJson() {
-    const phrases = song.phrases.map((p, i) => '    ' + JSON.stringify({ kana: p.kana, text: p.text, start: starts[i] }));
-    return '{\n' +
-      '  "title": ' + JSON.stringify(song.title) + ',\n' +
-      '  "youtubeId": ' + JSON.stringify(song.youtubeId) + ',\n' +
-      '  "loop": { "start": ' + song.loop.start + ', "end": ' + song.loop.end + ' },\n' +
-      '  "phrases": [\n' + phrases.join(',\n') + '\n  ]\n}\n';
+  function messageForClaude() {
+    const lines = song.phrases.map((ph, i) =>
+      (i + 1) + '. ' + (starts[i] == null ? 'null' : starts[i].toFixed(2)) + '  ' + ph.text);
+    return 'songs/' + songId + '.json の字幕タイミング（各フレーズの start 秒）を次の値に更新してください。\n\n' +
+      lines.join('\n') + '\n';
   }
 
-  async function copyJson() {
-    const text = songJson();
-    const out = $('json-out');
-    out.value = text;
-    out.hidden = false;
+  async function copyText(text) {
     try {
       await navigator.clipboard.writeText(text);
-      toast('JSONをコピーしました');
+      return true;
     } catch (e) {
+      const out = $('send-out');
       out.focus();
       out.select();
-      try {
-        document.execCommand('copy');
-        toast('JSONをコピーしました');
-      } catch (e2) {
-        toast('下の欄から手動でコピーしてください');
-      }
+      try { return document.execCommand('copy'); } catch (e2) { return false; }
     }
   }
 
+  async function sendToClaude() {
+    const text = messageForClaude();
+    const out = $('send-out');
+    out.value = text;
+    out.hidden = false;
+    // スマホなら共有シートから Claude アプリに直接送れる
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+    }
+    toast(await copyText(text) ? 'コピーしました。Claude に貼り付けて送ってください' : '下の欄から手動でコピーしてください');
+  }
+
+  async function copyForClaude() {
+    const text = messageForClaude();
+    const out = $('send-out');
+    out.value = text;
+    out.hidden = false;
+    toast(await copyText(text) ? 'コピーしました。Claude に貼り付けて送ってください' : '下の欄から手動でコピーしてください');
+  }
+
   function resetTimings() {
-    if (!confirm('この端末で編集したタイミングを消して、共有の設定（曲のJSON）に戻しますか？')) return;
-    remove('timings');
-    timingsAreLocal = false;
-    setStarts(song.phrases.map((p) => (typeof p.start === 'number' ? p.start : null)), false);
+    if (timingsDirty && !confirm('編集中のタイミングを捨てて、曲のJSONの値に戻しますか？')) return;
+    setStarts(sharedStarts.slice(), false);
     tapIndex = 0;
     updateTapTarget();
-    toast('共有の設定に戻しました');
+    toast('曲のJSONの値に戻しました');
   }
 
   // ---------- ループ区間 UI ----------
@@ -458,14 +470,10 @@
     $('song-title').textContent = song.title;
 
     // タイミング：localStorage の編集版を JSON より優先
-    const shared = song.phrases.map((p) => (typeof p.start === 'number' ? p.start : null));
-    const local = load('timings');
-    if (Array.isArray(local) && local.length === shared.length) {
-      starts = local;
-      timingsAreLocal = true;
-    } else {
-      starts = shared;
-    }
+    // タイミングは曲のJSONの値で固定（端末には保存しない）
+    sharedStarts = song.phrases.map((p) => (typeof p.start === 'number' ? p.start : null));
+    starts = sharedStarts.slice();
+    try { localStorage.removeItem(STORE_PREFIX + 'timings'); } catch (e) { /* 旧バージョンの保存分を掃除 */ }
 
     const savedLoop = load('loop');
     applyLoop(savedLoop && savedLoop.end > savedLoop.start ? savedLoop : { start: song.loop.start, end: song.loop.end }, false);
@@ -555,8 +563,12 @@
       renderPhraseList();
       updateTapTarget();
     });
-    $('btn-copy-json').addEventListener('click', copyJson);
+    $('btn-send').addEventListener('click', sendToClaude);
+    $('btn-copy-send').addEventListener('click', copyForClaude);
     $('btn-reset-timing').addEventListener('click', resetTimings);
+    window.addEventListener('beforeunload', (e) => {
+      if (timingsDirty) { e.preventDefault(); e.returnValue = ''; }
+    });
 
     // タブが非表示になったら一時停止（通信量・電池対策）
     document.addEventListener('visibilitychange', () => {

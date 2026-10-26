@@ -87,16 +87,17 @@
         <div class="row">
           <button class="small" id="btn-tap-first">最初のフレーズから記録し直す</button>
         </div>
-        <p class="note">再生中にフレーズが始まった瞬間に「次」をタップすると、その秒数が記録されます。一覧の行をタップすると、そのフレーズから記録を始められます。秒数をタップするとその位置へ移動します。</p>
+        <p class="note">再生中にフレーズが始まった瞬間に「次」をタップすると、その秒数が記録されます。一覧の行をタップすると、そのフレーズから記録を始められます（記録済みの値は上書き）。秒数をタップするとその位置へ移動します。</p>
       </div>
       <p class="note" id="timing-source"></p>
       <ul class="phrase-list" id="phrase-list"></ul>
       <div class="row">
-        <button class="small" id="btn-copy-json">JSONをコピー</button>
-        <button class="small" id="btn-reset-timing">共有の設定に戻す</button>
+        <button class="primary" id="btn-send">Claudeに送る</button>
+        <button class="small" id="btn-copy-send">テキストをコピー</button>
+        <button class="small" id="btn-reset-timing">JSONの値に戻す</button>
       </div>
-      <textarea class="json-out" id="json-out" readonly hidden></textarea>
-      <p class="note">編集したタイミングはこの端末にだけ保存されます。全員に反映するには「JSONをコピー」して <code>songs/<span id="song-id"></span>.json</code> に貼り付けてコミットしてください。</p>
+      <textarea class="json-out" id="send-out" readonly hidden></textarea>
+      <p class="note">タイミングは曲のJSON（<code>songs/<span id="song-id"></span>.json</code>）の値で固定です。ここでの編集は保存されません。打ち終わったら「Claudeに送る」（スマホは共有シートで Claude アプリを選択）か「テキストをコピー」して Claude に貼り付けると、JSONに反映してもらえます。</p>
     </section>
   </div>
 
