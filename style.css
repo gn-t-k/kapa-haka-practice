@@ -113,7 +113,30 @@ header.top a { text-decoration: none; font-size: .9rem; }
 .all-phrases .kana { font-weight: 600; }
 .all-phrases .text { color: var(--muted); font-size: .8rem; }
 
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.controls button {
+  appearance: none;
+  font: inherit;
+  font-size: 1.05rem;
+  min-height: 52px;
+  padding: 6px 12px;
+  background: #2a2f33;
+  color: var(--text);
+  border: 1px solid #3a4045;
+  border-radius: 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.controls button:active { transform: translateY(1px); }
+.controls button.primary { background: #e0483e; border-color: #e0483e; color: #fff; font-weight: 700; }
+
 .loop-count {
+  margin-top: 6px;
   text-align: right;
   font-size: .75rem;
   color: var(--faint);

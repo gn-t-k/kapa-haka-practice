@@ -49,17 +49,50 @@
 
   const isPlaying = () => player.getPlayerState() === YT.PlayerState.PLAYING;
 
+  function seek(t) {
+    player.seekTo(t, true);
+    ignoreLoopUntil = performance.now() + 400;
+    updateSubtitle(t);
+  }
+
+  function togglePlay() {
+    if (!player) return;
+    if (isPlaying()) {
+      player.pauseVideo();
+    } else {
+      const t = player.getCurrentTime() || 0;
+      if (t < song.loop.start || t >= song.loop.end) seek(song.loop.start);
+      player.playVideo();
+    }
+  }
+
+  // フレーズの頭から1.5秒以内なら前のフレーズへ、それ以降なら今のフレーズの頭へ戻る
+  function prevPhrase() {
+    if (!player) return;
+    const t = player.getCurrentTime() || 0;
+    const starts = song.phrases.map((p) => p.start).filter((s) => s != null && s < t - 1.5);
+    seek(starts.length ? Math.max(...starts) : song.loop.start);
+  }
+
+  let lastPlaying = null;
+  function updatePlayButton() {
+    const playing = !!player && isPlaying();
+    if (playing === lastPlaying) return;
+    lastPlaying = playing;
+    $('btn-play').textContent = playing ? '⏸ 停止' : '▶ 再生';
+  }
+
   // ---------- ループ監視（100ms） ----------
   function tick() {
     if (!player) return;
     const t = player.getCurrentTime() || 0;
     if (t >= song.loop.end && performance.now() > ignoreLoopUntil) {
-      player.seekTo(song.loop.start, true);
-      ignoreLoopUntil = performance.now() + 400;
+      seek(song.loop.start);
       loopCount++;
       $('loop-display').textContent = 'ループ ' + loopCount + ' 周';
     }
     updateSubtitle(t);
+    updatePlayButton();
   }
 
   // ---------- 字幕 ----------
@@ -128,6 +161,8 @@
     document.title = song.title + ' | ハカ練習';
 
     renderSubtitleArea();
+    $('btn-play').addEventListener('click', togglePlay);
+    $('btn-prev').addEventListener('click', prevPhrase);
     setInterval(tick, 100);
     startYouTube();
 
